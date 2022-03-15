@@ -336,8 +336,14 @@ function aws_cli() {
     if [ -n "${S3FS_PROFILE}" ]; then
         FLAGS="--profile ${S3FS_PROFILE}"
     fi
-    # shellcheck disable=SC2086,SC2068
-    aws $@ --endpoint-url "${S3_URL}" --ca-bundle /tmp/keystore.pem ${FLAGS}
+
+    # use self-signed certificate for testing with s3proxy
+    if [ -n "${S3PROXY_BINARY}" ]; then
+        # shellcheck disable=SC2086,SC2068
+        aws $@ --endpoint-url "${S3_URL}" --ca-bundle /tmp/keystore.pem ${FLAGS}
+    else
+        aws $@ --endpoint-url "${S3_URL}" ${FLAGS}
+    fi
 }
 
 function wait_for_port() {
